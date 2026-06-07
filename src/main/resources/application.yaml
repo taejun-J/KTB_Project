@@ -1,0 +1,27 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/springdatajpa?serverTimezone=UTC&useSSL=false
+    username: ktbUser
+    password: 12345
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create   # 개발 중에는 create / create-drop / update 중 선택
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+
+  profiles:
+    active: development
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+
+jwt:
+  secret: 3W8i2bTUFAf+rQtb6SV01OHnNEpqlntH/wfO770lw/gm3n2onNxHNNtbik6mNux7aNlMD0jsZHzdE2mYZe8vlA==
+  access-token-exp-seconds: 300
+  refresh-token-exp-seconds: 12096000
+
