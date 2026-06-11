@@ -34,11 +34,14 @@ public class Post {
     private User postedUser;
 
     //생성자
-    public Post(String postName, String postContent, String postImage){
+    //User 객체 전달(관계를 객체로 전달)
+    public Post(String postName, String postContent, String postImage, User postedUser){
+        this.postedUser = postedUser;
         this. postName = postName;
-        this.postLikesCount = postLikesCount;
-        this.postCommentCount = postCommentCount;
-        this.postViewCount = postViewCount;
+        //값은 초기화
+        this.postLikesCount = 0L;
+        this.postCommentCount = 0L;
+        this.postViewCount = 0L;
         this.postContent = postContent;
         this.postImage = postImage;
         this.status = entityStatus.ACTIVE;

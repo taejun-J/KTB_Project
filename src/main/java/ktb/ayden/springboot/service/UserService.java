@@ -121,7 +121,7 @@ public class UserService {
         // refreshToken은 컨트롤러에서 쿠키에 담기 위해 같이 반환
         return new LoginResultDto(
                 new LoginResponseDto(
-                        user,
+                        new UserResponseDto(user),
                         new TokenInformationDto(
                                 accessToken,
                                 jwtProvider.getAccessTokenValidityInMilliseconds()

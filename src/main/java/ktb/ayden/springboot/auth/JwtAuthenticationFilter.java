@@ -23,7 +23,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final String[] WHITE_LIST = {
             "/users/auth",
             "/users",
-            "/posts",
             "/users/token/refresh"
     };
 
@@ -39,7 +38,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
-
+        //뒤에 붙은 AUTHORIZATION 이런 것은 HTTP표준에 정의된 상수 -> 오타 방지에 좋음(request.getHeader("Authorization")과 같음)
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
         // 토큰이 없거나 형식이 틀리면 401
@@ -58,8 +57,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (!jwtProvider.isAccessToken(token)) {
                 throw new IllegalArgumentException("Not access token");
             }
-
-            // 여기서는 인증 정보 전달 없이 통과만 시킴
+            //필터에서 꺼낸 userId를 Request에 담기
+            Long userId = jwtProvider.getUserId(token);
+            request.setAttribute("userId",userId);
             filterChain.doFilter(request, response);
 
         } catch (Exception exception) {
