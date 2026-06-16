@@ -1,6 +1,6 @@
 package ktb.ayden.springboot.common;
 
-public enum entityStatus {
+public enum EntityStatus {
     ACTIVE,
     INACTIVE,
     DELETED

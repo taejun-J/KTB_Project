@@ -4,7 +4,7 @@ package ktb.ayden.springboot.entity;
 //JPA가 제공하는 DB 매핑 기능들(@Entity, @Id, @Column 등)을 사용하기 위해 가져오는 패키지
 import jakarta.persistence.*;
 //lombok은 반복적인 코드를 자동으로 만들어주는 라이브러리
-import ktb.ayden.springboot.common.entityStatus;
+import ktb.ayden.springboot.common.EntityStatus;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,7 +31,7 @@ public class User{
     private String password;
     private String profileImage;
     @Enumerated(EnumType.STRING)
-    private entityStatus status;
+    private EntityStatus status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -41,7 +41,7 @@ public class User{
         this.password = password;
         this.nickName = nickName;
         this.profileImage = profileImage;
-        this.status = entityStatus.ACTIVE;
+        this.status = EntityStatus.ACTIVE;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
@@ -56,11 +56,11 @@ public class User{
         this.nickName = nickName;
     }
     //회원 정보 변경(비밀번호)
-    public void changeUserPassword(String password){
-        this.password = password;
+    public void changeUserPassword(String encodedPassword){
+        this.password = encodedPassword;
     }
     //회원 상태 변경(delete)
-    public void changeUserStatus(entityStatus status){
+    public void changeUserStatus(EntityStatus status){
         this.status = status;
     }
 }

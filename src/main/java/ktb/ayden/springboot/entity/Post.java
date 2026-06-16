@@ -1,9 +1,8 @@
 package ktb.ayden.springboot.entity;
 
 import jakarta.persistence.*;
-import ktb.ayden.springboot.common.entityStatus;
+import ktb.ayden.springboot.common.EntityStatus;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
@@ -24,7 +23,7 @@ public class Post {
     private String postContent;
     private String postImage;
     @Enumerated(EnumType.STRING)
-    private entityStatus status;
+    private EntityStatus status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -44,7 +43,7 @@ public class Post {
         this.postViewCount = 0L;
         this.postContent = postContent;
         this.postImage = postImage;
-        this.status = entityStatus.ACTIVE;
+        this.status = EntityStatus.ACTIVE;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
@@ -55,7 +54,7 @@ public class Post {
         this.postImage = postImage;
     }
     //게시글 상태 변경(delete)
-    public void changePostStatus(entityStatus status){
+    public void changePostStatus(EntityStatus status){
         this.status = status;
     }
 

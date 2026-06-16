@@ -21,7 +21,7 @@ public class UserController {
     private final UserService userService;
     //회원가입
     @PostMapping
-    public UserResponseDto createUser(@RequestBody UserRequestDto request){
+    public UserResponseDto createUser(@Valid @RequestBody UserRequestDto request){
        //서비스 호출
         return userService.createUser(request);
     }
@@ -31,19 +31,20 @@ public class UserController {
         return userService.getUser(userId);
     }
     //회원 정보 수정(프로필 사진, 닉네임)
+    //현재 로그인 한 유저의 정보도 받아오도록 수정 -> 나중에 수정,삭제에서의 검증을 위해
     @PatchMapping("/{userId}")
-    public UserResponseDto updateUser(@PathVariable Long userId, @RequestBody UserRequestDto request){
-        return userService.updateUser(userId,request);
+    public UserResponseDto updateUser(@RequestAttribute("userId") Long loginUserId,@PathVariable Long userId, @Valid @RequestBody UserUpdateRequestDto request){
+        return userService.updateUser(loginUserId,userId,request);
     }
     //회원 정보 수정 (비밀번호)
     @PutMapping("/{userId}/password")
-    public UserResponseDto updateUserPassword(@PathVariable Long userId,@RequestBody UserRequestDto request){
-        return userService.updateUserPassword(userId,request);
+    public UserResponseDto updateUserPassword(@RequestAttribute("userId") Long loginUserId, @PathVariable Long userId,@Valid @RequestBody UserPasswordUpdateReqDto request){
+        return userService.updateUserPassword(loginUserId,userId,request);
     }
     //회원탈퇴
     @DeleteMapping("/{userId}")
-    public UserResponseDto softDeleteUser(@PathVariable Long userId){
-        return userService.softDeleteUser(userId);
+    public UserResponseDto softDeleteUser(@RequestAttribute("userId") Long loginUserId, @PathVariable Long userId){
+        return userService.softDeleteUser(loginUserId, userId);
     }
 
     //하단은 로그인 관련(인증,인가 추가 이후)

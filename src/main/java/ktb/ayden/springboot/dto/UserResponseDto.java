@@ -1,6 +1,6 @@
 package ktb.ayden.springboot.dto;
 
-import ktb.ayden.springboot.common.entityStatus;
+import ktb.ayden.springboot.common.EntityStatus;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import ktb.ayden.springboot.entity.User;
@@ -13,7 +13,7 @@ public class UserResponseDto {
     private Long userId;
     private String nickName;
     private String profileImage;
-    private entityStatus status;
+    private EntityStatus status;
     private LocalDateTime createdAt;
 
     //응답DTO에 엔티티의 값을 넣어 응답을 위한 객체 생성
