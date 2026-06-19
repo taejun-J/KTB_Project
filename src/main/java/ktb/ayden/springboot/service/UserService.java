@@ -1,6 +1,6 @@
 package ktb.ayden.springboot.service;
 
-//import jakarta.transaction.Transactional;
+
 import ktb.ayden.springboot.common.EntityStatus;
 import ktb.ayden.springboot.common.exception.CustomException;
 import ktb.ayden.springboot.common.exception.ErrorCode;
@@ -176,6 +176,7 @@ public class UserService {
         );
     }
         // Access Token 재발급
+        //해당 부분은 예외처리 CustomException에서 제외 -> 재사용성 떨어진다 판단
         @Transactional
         public TokenResultDto refreshAccessToken(String refreshToken) {
 
