@@ -43,6 +43,7 @@ public class Comment {
     //Comment엔티티의 변경 메서드
     public void changeCommentContent(String commentText){
         this.commentText = commentText;
+        this.updatedAt= LocalDateTime.now();
     }
     //Comment삭제
     public void changeCommentStatus(EntityStatus status){

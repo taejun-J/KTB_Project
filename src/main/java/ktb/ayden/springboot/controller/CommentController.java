@@ -6,6 +6,7 @@ import ktb.ayden.springboot.dto.CommentResponseDto;
 import ktb.ayden.springboot.service.CommentService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +22,8 @@ public class CommentController {
 
     //1. 댓글추가
     @PostMapping
+    //201응답 반환하도록 추가
+    @ResponseStatus(HttpStatus.CREATED)
     public CommentResponseDto addComment(
                 @Valid @RequestAttribute("userId") Long userId,
                 @PathVariable("postId") Long postId,

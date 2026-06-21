@@ -22,13 +22,42 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 //화이트 리스트는 로그인 안 해도 접근이 가능한 API목록
     private static final String[] WHITE_LIST = {
             "/users/auth",
-            "/users",
             "/users/token/refresh"
     };
 
     @Override
     protected boolean shouldNotFilter(@NonNull HttpServletRequest request) {
-        return PatternMatchUtils.simpleMatch(WHITE_LIST, request.getRequestURI());
+        //OPTIONS요청시 -> 필터 적용안하고 통과
+        //브라우저가 CORS확인하려고 자동으로 보내는 사전요청이 OPTIONS
+        String uri = request.getRequestURI();
+        String method = request.getMethod();
+
+        // OPTIONS 요청은 CORS 사전 요청이므로 JWT 검사하지 않음
+        if ("OPTIONS".equalsIgnoreCase(method)) {
+            return true;
+        }
+        //User관련
+        //회원가입 검사X
+        if (uri.equals("/users") && "POST".equalsIgnoreCase(method)) {
+            return true;
+        }
+        //로그인 검사X
+        if (uri.equals("/users/auth") && "POST".equalsIgnoreCase(method)) {
+            return true;
+        }
+        //토큰 재발급 검사X
+        if (uri.equals("/users/token/refresh") && "POST".equalsIgnoreCase(method)) {
+            return true;
+        }
+        //Post관련
+        //게시글 목록 조회 검사X
+        if (uri.startsWith("/posts") && "GET".equalsIgnoreCase(method)) {
+            return true;
+        }
+
+
+        return false;
+
     }
 
     @Override
@@ -38,6 +67,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
+
         //뒤에 붙은 AUTHORIZATION 이런 것은 HTTP표준에 정의된 상수 -> 오타 방지에 좋음(request.getHeader("Authorization")과 같음)
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 

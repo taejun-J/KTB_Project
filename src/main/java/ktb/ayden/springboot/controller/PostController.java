@@ -5,6 +5,7 @@ import ktb.ayden.springboot.dto.PostListResponseDto;
 import ktb.ayden.springboot.dto.PostRequestDto;
 import ktb.ayden.springboot.service.PostService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,6 +18,8 @@ public class PostController {
 
     //1.게시글 추가
     @PostMapping
+    //201응답 반환하도록 추가
+    @ResponseStatus(HttpStatus.CREATED)
     public PostDetailResponseDto addPost(
             //RequestAttribute -> 필터가 서버 내부에서 넣어준 값 / 서버가 토큰에서 확인한 로그인 사용자
             @RequestAttribute("userId") Long userId,
