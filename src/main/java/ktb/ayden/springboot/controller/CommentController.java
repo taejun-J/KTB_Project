@@ -1,6 +1,7 @@
 package ktb.ayden.springboot.controller;
 
 import jakarta.validation.Valid;
+import ktb.ayden.springboot.common.response.ApiResponse;
 import ktb.ayden.springboot.dto.CommentRequestDto;
 import ktb.ayden.springboot.dto.CommentResponseDto;
 import ktb.ayden.springboot.service.CommentService;
@@ -24,37 +25,41 @@ public class CommentController {
     @PostMapping
     //201응답 반환하도록 추가
     @ResponseStatus(HttpStatus.CREATED)
-    public CommentResponseDto addComment(
+    public ApiResponse<CommentResponseDto> addComment(
                 @Valid @RequestAttribute("userId") Long userId,
                 @PathVariable("postId") Long postId,
                 @RequestBody CommentRequestDto request
     ){
-       return commentService.addComment(postId,userId,request);
+       CommentResponseDto res = commentService.addComment(postId,userId,request);
+       return ApiResponse.success(res,"댓글추가완료");
     }
 
     //2. 댓글 조회(읽어오기)
     @GetMapping
     //리스트의 형태로 받아와야함
-    public List<CommentResponseDto> readComment(@Valid @PathVariable("postId") Long postId){
-        return commentService.getCommentsByPost(postId);
+    public ApiResponse<List<CommentResponseDto>> readComment(@Valid @PathVariable("postId") Long postId){
+        List<CommentResponseDto> res = commentService.getCommentsByPost(postId);
+        return ApiResponse.success(res,"댓글 조회 성공");
     }
     //3. 댓글 수정하기
     @PatchMapping("/{commentId}")
-    public CommentResponseDto changeComment(
+    public ApiResponse<CommentResponseDto> changeComment(
             @Valid @PathVariable("commentId") Long commentId,
             @Valid @PathVariable("postId") Long postId,
             @Valid @RequestAttribute("userId") Long userId,
             @RequestBody CommentRequestDto request
     ){
-        return commentService.updateComment(commentId,postId,userId,request);
+        CommentResponseDto res = commentService.updateComment(commentId,postId,userId,request);
+        return ApiResponse.success(res,"댓글 수정 성공");
     }
     //4. 댓글 삭제하기
     @DeleteMapping("/{commentId}")
-    public CommentResponseDto deleteComment(
+    public ApiResponse<CommentResponseDto> deleteComment(
             @Valid @RequestAttribute("userId") Long userId,
             @Valid @PathVariable("postId") Long postId,
             @Valid @PathVariable("commentId") Long commentId
     ){
-        return commentService.softDeleteComment(userId,postId,commentId);
+        CommentResponseDto res = commentService.softDeleteComment(userId,postId,commentId);
+        return ApiResponse.success(res,"댓글 삭제 성공");
     }
 }
