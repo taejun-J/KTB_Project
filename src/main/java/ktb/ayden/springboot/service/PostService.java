@@ -7,6 +7,7 @@ import ktb.ayden.springboot.dto.PostListResponseDto;
 import ktb.ayden.springboot.dto.PostRequestDto;
 import ktb.ayden.springboot.dto.UserRequestDto;
 import ktb.ayden.springboot.entity.Post;
+import ktb.ayden.springboot.entity.User;
 import ktb.ayden.springboot.repository.PostRepository;
 import ktb.ayden.springboot.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,11 +25,14 @@ public class PostService {
     //1.게시글 추가
     //인증,인가 구현 후 추가
     @Transactional
-    public PostDetailResponseDto addPost(PostRequestDto request){
+    public PostDetailResponseDto addPost(Long userId, PostRequestDto request){
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
         Post post = new Post(
                 request.getPostName(),
                 request.getPostContent(),
-                request.getPostImage()
+                request.getPostImage(),
+                user
         );
         Post savedPost = postRepository.save(post);
         return new PostDetailResponseDto(savedPost);

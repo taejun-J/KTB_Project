@@ -26,7 +26,7 @@ public class PostDetailResponseDto {
         this.postId = post.getPostId();
         this.postImage = post.getPostImage();
         this.postName = post.getPostName();
-        //User엔티티에서 닉네임 받아오기
+        //User엔티티에서 닉네임 받아오기 postedUser -> nickName받기
         this.postUser = post.getPostedUser().getNickName();
         this.postLikesCount = post.getPostLikesCount();
         this.postCommentCount = post.getPostCommentCount();

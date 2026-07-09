@@ -17,8 +17,12 @@ public class PostController {
 
     //1.게시글 추가
     @PostMapping
-    public PostDetailResponseDto addPost(@RequestBody PostRequestDto request){
-        return postService.addPost(request);
+    public PostDetailResponseDto addPost(
+            //RequestAttribute -> 필터가 서버 내부에서 넣어준 값 / 서버가 토큰에서 확인한 로그인 사용자
+            @RequestAttribute("userId") Long userId,
+            @RequestBody PostRequestDto request
+            ){
+        return postService.addPost(userId,request);
     }
     //2. 게시글 목록 조회
     @GetMapping()
