@@ -15,7 +15,7 @@ permissions:
 jobs:
   build:
     #runner -> self-hosted-runner 사용
-#    runs-on: self-hosted
+    #runs-on: self-hosted
     runs-on: ubuntu-latest
     steps:
       #checkout Action 최신버전 v6, 내코드의 ver적는거 X
