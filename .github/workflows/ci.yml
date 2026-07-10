@@ -4,9 +4,9 @@ name: ayden-community-CI
 # main브랜치만 푸시에도 실행, dev는 공통으로 pr 닫힐때만
 on:
   push:
-    branches:[main]
+    branches: [main]
   pull_request:
-    branches:[dev]
+    branches: [dev]
 #워크플로우 -> 깃 권한
 permissions:
   contents: read
