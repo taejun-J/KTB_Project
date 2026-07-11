@@ -4,6 +4,7 @@ name: ayden-community-CI
 # main브랜치만 푸시에도 실행, dev는 공통으로 pr 닫힐때만
 on:
   push:
+    #cicd 테스트용 브랜치 연결
     branches: [feature/ci-cd-test]
   pull_request:
     branches: [dev]
@@ -17,6 +18,28 @@ jobs:
     #runner -> self-hosted-runner 사용
     #runs-on: self-hosted
     runs-on: ubuntu-latest
+    # 테스트 실행에 CI용 DB정보 추가
+    services:
+        mysql:
+          image: mysql:8.4
+
+          env:
+            MYSQL_DATABASE: springdatajpa
+            MYSQL_USER: ktbUser
+            MYSQL_PASSWORD: ${{ secrets.CI_DB_PASSWORD }}
+            MYSQL_ROOT_PASSWORD: ${{ secrets.CI_DB_PASSWORD }}
+
+          ports:
+            - 3306:3306
+
+      # application.yml <- 환경변수
+    env:
+        DB_HOST: localhost
+        DB_PORT: 3306
+        DB_NAME: springdatajpa
+        DB_USERNAME: ktbUser
+        DB_PASSWORD: ${{ secrets.CI_DB_PASSWORD }}
+        JWT_SECRET: ${{ secrets.CI_JWT_SECRET }}
     steps:
       #checkout Action 최신버전 v6, 내코드의 ver적는거 X
       - uses: actions/checkout@v6
@@ -27,6 +50,7 @@ jobs:
           distribution: 'temurin'
       #gradle build 수행
       - name: Grant execute permission for gradlew
+        #w8 피드백 반영 -> 권한 추가
         run: chmod +x gradlew
 
       - name: Build with Gradle
