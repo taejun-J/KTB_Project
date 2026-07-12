@@ -7,7 +7,9 @@ on:
     #cicd 테스트용 브랜치 연결
     branches: [feature/ci-cd-test]
   pull_request:
-    branches: [dev]
+    branches:
+      - dev
+      - main
 #워크플로우 -> 깃 권한
 permissions:
   contents: read
@@ -15,9 +17,9 @@ permissions:
 #워크플로우에서 실제 진행 할 작업
 jobs:
   build:
-    #runner -> self-hosted-runner 사용
-    #runs-on: self-hosted
-    runs-on: ubuntu-latest
+    #runner -> Github-hosted-runner 사용
+    #ubuntu 버전 고정(24.04), latest 사용 지양
+    runs-on: ubuntu-24.04
     # 테스트 실행에 CI용 DB정보 추가
     services:
         mysql:
