@@ -152,7 +152,6 @@ jobs:
       - name: Deploy Backend
         run: |
           IMAGE="${{ secrets.DOCKER_USERNAME }}/community-backend:${{ github.sha }}"
-        #ssh 명령어 실행
           ssh \
             -i ~/.ssh/aydenKey.pem \
             -o StrictHostKeyChecking=no \
@@ -181,8 +180,8 @@ jobs:
       - name: Remove TempIP from bastion SG
         #무조건 실행하게
         if: always()
-        run: |
         #앞의 authorize의 반대 <-> revoke, 규칙 삭제(생성한 거 그대로 삭제)
+        run: |
           aws ec2 revoke-security-group-ingress \
             --group-id "${{ secrets.BASTION_SG_ID }}" \
             --protocol tcp \
