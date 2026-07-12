@@ -3,7 +3,7 @@ name: ayden-community-CI-CD
 
 on:
   #main push때 실행되는 점이 차이
-  #test때는 feature브랜치에 테스트
+  #test때는 feature브랜치에 테스
   push:
     branches:
       - feature/ci-cd-test
@@ -152,7 +152,7 @@ jobs:
       - name: Deploy Backend
         run: |
           IMAGE="${{ secrets.DOCKER_USERNAME }}/community-backend:${{ github.sha }}"
-      #ssh 명령어 실행
+        #ssh 명령어 실행
           ssh \
             -i ~/.ssh/aydenKey.pem \
             -o StrictHostKeyChecking=no \
