@@ -1,0 +1,54 @@
+name: Test Bastion SG Rule
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  test-sg:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get GitHub Runner Public IP
+        id: runner-ip
+        run: |
+          RUNNER_IP=$(curl -4 -fsSL https://checkip.amazonaws.com | tr -d '\n')
+
+          if [ -z "$RUNNER_IP" ]; then
+            echo "Runner IP 조회 실패"
+            exit 1
+          fi
+
+          echo "Runner public IP: $RUNNER_IP"
+          echo "cidr=${RUNNER_IP}/32" >> "$GITHUB_OUTPUT"
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ secrets.AWS_GITHUB_ACTIONS_ROLE_ARN }}
+          aws-region: ap-northeast-2
+
+      - name: Add Temporary SSH Rule
+        run: |
+          aws ec2 authorize-security-group-ingress \
+            --group-id "${{ secrets.BASTION_SG_ID }}" \
+            --protocol tcp \
+            --port 22 \
+            --cidr "${{ steps.runner-ip.outputs.cidr }}"
+
+      - name: Wait
+        run: |
+          echo "Runner IP가 Bastion SG에 추가되었습니다."
+          sleep 10
+
+      - name: Remove Temporary SSH Rule
+        if: always()
+        run: |
+          aws ec2 revoke-security-group-ingress \
+            --group-id "${{ secrets.BASTION_SG_ID }}" \
+            --protocol tcp \
+            --port 22 \
+            --cidr "${{ steps.runner-ip.outputs.cidr }}"
