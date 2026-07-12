@@ -172,7 +172,6 @@ jobs:
                 --restart always \
                 -p 8080:8080 \
                 --env-file /home/ubuntu/backend.env \
-               #제일 위에서 불렀던 그 이미지(실행할 새 이미지)
                 '$IMAGE'
               #사용한 tar는 삭제
               rm -f /tmp/community-backend.tar"
