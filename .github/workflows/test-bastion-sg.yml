@@ -3,7 +3,7 @@ name: Test Bastion SG Rule
 on:
   push:
     branches:
-      - feature/ci-cd-test
+#      - feature/ci-cd-test
 
 permissions:
   contents: read
