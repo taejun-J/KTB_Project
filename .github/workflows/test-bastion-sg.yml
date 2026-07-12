@@ -1,8 +1,8 @@
 name: Test Bastion SG Rule
 
-on:
-  push:
-    branches:
+#on:
+#  push:
+#    branches:
 #      - feature/ci-cd-test
 
 permissions:
