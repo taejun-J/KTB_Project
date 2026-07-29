@@ -14,7 +14,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 @Component
 @RequiredArgsConstructor
-//이 클래스만 예외처리가 되어있음(교재 기반 코드)
 //요청 단위로 실행 여부 제어해서 한 번만 적용하게 하는 것 (OncePerrequestFilter)
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 

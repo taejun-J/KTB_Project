@@ -3,7 +3,12 @@ server:
 
 spring:
   datasource:
-    url: ${DB_URL}
+    url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+      ?serverTimezone=UTC
+      &sslMode=VERIFY_CA
+      &trustCertificateKeyStoreUrl=file:/etc/mysql-tls/mysql-truststore.p12
+      &trustCertificateKeyStoreType=PKCS12
+      &trustCertificateKeyStorePassword=${TRUSTSTORE_PASSWORD}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -12,6 +17,9 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: false
+
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:development}
 
 jwt:
   secret: ${JWT_SECRET}

@@ -26,9 +26,9 @@ public class CommentController {
     //201응답 반환하도록 추가
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<CommentResponseDto> addComment(
-                @Valid @RequestAttribute("userId") Long userId,
-                @PathVariable("postId") Long postId,
-                @RequestBody CommentRequestDto request
+                 @RequestAttribute("userId") Long userId,
+                 @PathVariable("postId") Long postId,
+                 @Valid @RequestBody CommentRequestDto request
     ){
        CommentResponseDto res = commentService.addComment(postId,userId,request);
        return ApiResponse.success(res,"댓글추가완료");
@@ -44,10 +44,10 @@ public class CommentController {
     //3. 댓글 수정하기
     @PatchMapping("/{commentId}")
     public ApiResponse<CommentResponseDto> changeComment(
-            @Valid @PathVariable("commentId") Long commentId,
-            @Valid @PathVariable("postId") Long postId,
-            @Valid @RequestAttribute("userId") Long userId,
-            @RequestBody CommentRequestDto request
+             @PathVariable("commentId") Long commentId,
+             @PathVariable("postId") Long postId,
+             @RequestAttribute("userId") Long userId,
+             @Valid @RequestBody CommentRequestDto request
     ){
         CommentResponseDto res = commentService.updateComment(commentId,postId,userId,request);
         return ApiResponse.success(res,"댓글 수정 성공");
@@ -55,9 +55,9 @@ public class CommentController {
     //4. 댓글 삭제하기
     @DeleteMapping("/{commentId}")
     public ApiResponse<CommentResponseDto> deleteComment(
-            @Valid @RequestAttribute("userId") Long userId,
-            @Valid @PathVariable("postId") Long postId,
-            @Valid @PathVariable("commentId") Long commentId
+            @RequestAttribute("userId") Long userId,
+            @PathVariable("postId") Long postId,
+            @PathVariable("commentId") Long commentId
     ){
         CommentResponseDto res = commentService.softDeleteComment(userId,postId,commentId);
         return ApiResponse.success(res,"댓글 삭제 성공");
