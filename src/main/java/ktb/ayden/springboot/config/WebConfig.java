@@ -12,8 +12,8 @@ public class WebConfig  implements WebMvcConfigurer {
         registry.addMapping("/**")
                 //Cors 에러 대비 -> 사용하는 url입력
                 .allowedOrigins(
-                        "http://localhost:3001",
-                        "http://127.0.0.1:3001"
+                        "http://localhost:8082",
+                        "http://127.0.0.1:8082"
                 )
                 .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
