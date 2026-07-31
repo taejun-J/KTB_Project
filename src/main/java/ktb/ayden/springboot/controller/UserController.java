@@ -1,6 +1,7 @@
 package ktb.ayden.springboot.controller;
 
 import jakarta.validation.Valid;
+import ktb.ayden.springboot.common.response.ApiResponse;
 import ktb.ayden.springboot.dto.*;
 import ktb.ayden.springboot.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -21,37 +22,43 @@ public class UserController {
     private final UserService userService;
     //회원가입
     @PostMapping
-    public UserResponseDto createUser(@Valid @RequestBody UserRequestDto request){
-       //서비스 호출
-        return userService.createUser(request);
+    //반환 타입 UserResponseDto -> ApiResponse
+
+    public ApiResponse<UserResponseDto>createUser(@Valid @RequestBody UserRequestDto request){
+        UserResponseDto res = userService.createUser(request);
+        return ApiResponse.success(res,"회원가입 성공");
     }
     //회원조회
     @GetMapping("/{userId}")
-    public UserResponseDto getUser(@PathVariable Long userId){
-        return userService.getUser(userId);
+    public ApiResponse<UserResponseDto> getUser(@PathVariable Long userId) {
+        UserResponseDto res = userService.getUser(userId);
+        return ApiResponse.success(res, "회원조회 성공");
     }
     //회원 정보 수정(프로필 사진, 닉네임)
     //현재 로그인 한 유저의 정보도 받아오도록 수정 -> 나중에 수정,삭제에서의 검증을 위해
     @PatchMapping("/{userId}")
-    public UserResponseDto updateUser(@RequestAttribute("userId") Long loginUserId,@PathVariable Long userId, @Valid @RequestBody UserUpdateRequestDto request){
-        return userService.updateUser(loginUserId,userId,request);
+    public ApiResponse<UserResponseDto> updateUser(@RequestAttribute("userId") Long loginUserId,@PathVariable Long userId, @Valid @RequestBody UserUpdateRequestDto request){
+        UserResponseDto res = userService.updateUser(loginUserId,userId,request);
+        return ApiResponse.success(res,"회원정보 수정 성공");
     }
     //회원 정보 수정 (비밀번호)
     @PutMapping("/{userId}/password")
-    public UserResponseDto updateUserPassword(@RequestAttribute("userId") Long loginUserId, @PathVariable Long userId,@Valid @RequestBody UserPasswordUpdateReqDto request){
-        return userService.updateUserPassword(loginUserId,userId,request);
+    public ApiResponse<UserResponseDto> updateUserPassword(@RequestAttribute("userId") Long loginUserId, @PathVariable Long userId,@Valid @RequestBody UserPasswordUpdateReqDto request){
+        UserResponseDto res = userService.updateUserPassword(loginUserId,userId,request);
+        return ApiResponse.success(res,"비밀번호 변경 성공");
     }
     //회원탈퇴
     @DeleteMapping("/{userId}")
-    public UserResponseDto softDeleteUser(@RequestAttribute("userId") Long loginUserId, @PathVariable Long userId){
-        return userService.softDeleteUser(loginUserId, userId);
+    public ApiResponse<UserResponseDto> softDeleteUser(@RequestAttribute("userId") Long loginUserId, @PathVariable Long userId){
+        UserResponseDto res =userService.softDeleteUser(loginUserId, userId);
+        return ApiResponse.success(res,"회원탈퇴 성공");
     }
 
     //하단은 로그인 관련(인증,인가 추가 이후)
 
     // 로그인
     @PostMapping("/auth")
-    public LoginResponseDto login(
+    public ApiResponse<LoginResponseDto> login(
             @Valid @RequestBody LoginRequestDto loginRequest,
             HttpServletResponse httpResponse
     ) {
@@ -77,13 +84,14 @@ public class UserController {
         );
 
         // Access Token 정보 반환
-        return result.getResponse();
+        LoginResponseDto res = result.getResponse();
+        return ApiResponse.success(res,"로그인 성공");
     }
 
     // 액세스 토큰 재발급
     // ===================== Access Token 재발급 =====================
     @PostMapping("/token/refresh")
-    public TokenInformationDto refreshAccessToken(
+    public ApiResponse<TokenInformationDto> refreshAccessToken(
             // 브라우저 쿠키에 저장된 Refresh Token 읽기
             @CookieValue(
                     name = "refreshToken",
@@ -122,7 +130,8 @@ public class UserController {
         }
 
         // 새 Access Token 반환
-        return result.getToken();
+        TokenInformationDto res = result.getToken();
+        return ApiResponse.success(res,"새 Access Token 반환");
     }
 
 }

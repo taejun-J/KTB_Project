@@ -1,6 +1,6 @@
 package ktb.ayden.springboot.service;
 
-//import jakarta.transaction.Transactional;
+
 import ktb.ayden.springboot.common.EntityStatus;
 import ktb.ayden.springboot.common.exception.CustomException;
 import ktb.ayden.springboot.common.exception.ErrorCode;
@@ -87,11 +87,11 @@ public class UserService {
         }
         User user = userRepository.findByUserIdAndStatus(userId, EntityStatus.ACTIVE)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        //현재 비밀번호 입력(검증)
-        //matches(방금 입력한 평문 비번, DB저장된 암호화 비번)
-        if(!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())){
-            throw new CustomException(ErrorCode.INVALID_PASSWORD);
-        }//새 비번 입력, 확인 검징
+        //현재 비밀번호 입력(검증) -> 일단 삭제, 프론트에는 입력공간이 없었음
+//        //matches(방금 입력한 평문 비번, DB저장된 암호화 비번)
+//        if(!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())){
+//            throw new CustomException(ErrorCode.INVALID_PASSWORD);
+//        }//새 비번 입력, 확인 검징
         if(!request.getNewPassword().equals(request.getNewPasswordCheck())){
             throw new CustomException(ErrorCode.PASSWORD_MISMATCH);
         }
@@ -176,6 +176,7 @@ public class UserService {
         );
     }
         // Access Token 재발급
+        //해당 부분은 예외처리 CustomException에서 제외 -> 재사용성 떨어진다 판단
         @Transactional
         public TokenResultDto refreshAccessToken(String refreshToken) {
 

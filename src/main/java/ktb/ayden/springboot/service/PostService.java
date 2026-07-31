@@ -1,6 +1,8 @@
 package ktb.ayden.springboot.service;
 
 //import jakarta.transaction.Transactional;
+import ktb.ayden.springboot.common.exception.CustomException;
+import ktb.ayden.springboot.common.exception.ErrorCode;
 import org.springframework.transaction.annotation.Transactional;
 import ktb.ayden.springboot.common.EntityStatus;
 import ktb.ayden.springboot.dto.PostDetailResponseDto;
@@ -27,7 +29,7 @@ public class PostService {
     @Transactional
     public PostDetailResponseDto addPost(Long userId, PostRequestDto request){
         User user = userRepository.findByUserIdAndStatus(userId, EntityStatus.ACTIVE)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         Post post = new Post(
                 request.getPostName(),
                 request.getPostContent(),
@@ -56,33 +58,33 @@ public class PostService {
     @Transactional(readOnly = true)
     public PostDetailResponseDto getPostDetail(Long postId){
         Post post = postRepository.findByPostIdAndStatus(postId, EntityStatus.ACTIVE)
-                .orElseThrow(() -> new IllegalArgumentException("요청한 대상을 찾을 수 없습니다. 주소가 정확한지 다시 한 번 확인해주세요."));
+                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
         return new PostDetailResponseDto(post);
     }
 
     //4. 게시글 수정
     @Transactional
-    public PostDetailResponseDto updatePost(Long userId, Long postId, PostRequestDto request){
+    public PostDetailResponseDto updatePost(Long userId, Long postId, PostRequestDto request) {
         Post post = postRepository.findByPostIdAndStatus(postId, EntityStatus.ACTIVE)
-                .orElseThrow(() -> new IllegalArgumentException("요청한 대상을 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
         if (!post.getPostedUser().getUserId().equals(userId)) {
-            throw new IllegalArgumentException("수정 권한이 없습니다.");
+            throw new CustomException(ErrorCode.FORBIDDEN_USER);
         }
-        post.changePostInformation(
-                request.getPostName(),
-                request.getPostContent(),
-                request.getPostImage()
-                );
-        return new PostDetailResponseDto(post);
-    }
+            post.changePostInformation(
+                    request.getPostName(),
+                    request.getPostContent(),
+                    request.getPostImage()
+            );
+            return new PostDetailResponseDto(post);
+        }
 
     //5. 게시글 삭제(소프트딜리트)
     @Transactional
     public PostDetailResponseDto softDeletePost(Long userId, Long postId){
         Post post = postRepository.findByPostIdAndStatus(postId, EntityStatus.ACTIVE)
-                .orElseThrow(() -> new IllegalArgumentException("요청한 대상을 찾을 수 없습니다. 주소가 정확한지 다시 한 번 확인해주세요."));
+                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
         if (!post.getPostedUser().getUserId().equals(userId)) {
-            throw new IllegalArgumentException("삭제 권한이 없습니다.");
+            throw new CustomException(ErrorCode.FORBIDDEN_USER);
         }
         post.changePostStatus(EntityStatus.INACTIVE);
         return new PostDetailResponseDto(post);
