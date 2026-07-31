@@ -1,6 +1,6 @@
 package ktb.ayden.springboot.dto;
 
-import ktb.ayden.springboot.common.entityStatus;
+import ktb.ayden.springboot.common.EntityStatus;
 import ktb.ayden.springboot.entity.Post;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,7 +18,7 @@ public class PostDetailResponseDto {
     private Long postCommentCount;
     private Long postViewCount;
     private String postContent;
-    private entityStatus status;
+    private EntityStatus status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

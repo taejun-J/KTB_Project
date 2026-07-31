@@ -38,14 +38,15 @@ public class PostController {
     }
     //4. 게시글 정보 변경
     @PatchMapping ("/{postId}")
-    public PostDetailResponseDto updatePost(@PathVariable Long postId,@RequestBody PostRequestDto request) {
-        return postService.updatePost(postId,request);
+    public PostDetailResponseDto updatePost(@RequestAttribute("userId") Long userId, @PathVariable Long postId,@RequestBody PostRequestDto request) {
+
+        return postService.updatePost(userId,postId,request);
     }
 
     //5. 게시글 삭제
     @DeleteMapping("/{postId}")
-    public PostDetailResponseDto softDeletePost(@PathVariable Long postId){
-        return postService.softDeletePost(postId);
+    public PostDetailResponseDto softDeletePost(@PathVariable Long postId, @RequestAttribute("userId")Long userId){
+        return postService.softDeletePost(userId,postId);
     }
 
 
