@@ -2,9 +2,7 @@ package ktb.ayden.springboot.dto;
 
 import ktb.ayden.springboot.common.EntityStatus;
 import ktb.ayden.springboot.entity.Comment;
-import ktb.ayden.springboot.repository.CommentRepository;
 import lombok.Getter;
-import org.springframework.cglib.core.Local;
 
 import java.time.LocalDateTime;
 

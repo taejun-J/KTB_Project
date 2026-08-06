@@ -33,9 +33,10 @@ dependencies {
 	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 
 	//암호화에 필요
-	dependencies {
-		implementation 'org.springframework.security:spring-security-crypto'
-	}
+	implementation 'org.springframework.security:spring-security-crypto'
+
+	//Actuator - healthcheck기능 사용 위해 추가
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-webmvc'

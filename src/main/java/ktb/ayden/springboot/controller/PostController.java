@@ -41,9 +41,14 @@ public class PostController {
     }
     //3. 게시글 상세 조회
     @GetMapping("/{postId}")
-    public ApiResponse<PostDetailResponseDto>getPostDetail(@PathVariable Long postId){
-        PostDetailResponseDto res = postService.getPostDetail(postId);
-        return ApiResponse.success(res,"게시글 상제 조회 성공");
+//    public ApiResponse<PostDetailResponseDto>getPostDetail(@PathVariable Long postId){
+    //비로그인 조회도 허용해야 하므로 required=false -> 토큰 없으면 userId가 null로 들어옴
+    public ApiResponse<PostDetailResponseDto>getPostDetail(
+            @RequestAttribute(value = "userId", required = false) Long userId,
+            @PathVariable Long postId){
+//        PostDetailResponseDto res = postService.getPostDetail(postId);
+        PostDetailResponseDto res = postService.getPostDetail(userId, postId);
+        return ApiResponse.success(res,"게시글 상세 조회 성공");
     }
     //4. 게시글 정보 변경
     @PatchMapping ("/{postId}")
@@ -58,6 +63,7 @@ public class PostController {
         PostDetailResponseDto res = postService.softDeletePost(userId,postId);
         return ApiResponse.success(res,"게시글 삭제 성공");
     }
+
 
 
 }

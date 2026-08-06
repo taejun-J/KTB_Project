@@ -55,7 +55,7 @@ public class CommentService {
             throw new CustomException(ErrorCode.POST_NOT_FOUND);
         }
 
-        return commentRepository.findAllByCommentedPost_PostIdAndStatus(postId, EntityStatus.ACTIVE)
+        return commentRepository.findAllByCommentedPost_PostIdAndStatusOrderBycommentIdDesc(postId, EntityStatus.ACTIVE)
                 //for문과 동일
                 //리스트를 하나씩 꺼내서 처리할 준비
                 .stream()

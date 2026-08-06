@@ -37,10 +37,10 @@ public class UserService {
     //UserSignupResponseDto를 반환하는 CreateUser메소드 선언
     //비밀번호 암호화 추가
     public UserResponseDto createUser(UserRequestDto request){
-        //이메일 중복 검사 추가
-        if(userRepository.existsByEmail(request.getEmail())){
-            throw new CustomException((ErrorCode.EXIST_EMAIL));
-        }
+//        //1-1.이메일 중복 검사 추가
+//        if(userRepository.existsByEmailAndStatus(em)){
+//            throw new CustomException((ErrorCode.EXIST_EMAIL));
+//        }
         //비번확인 과정 추가
         if (!request.getPassword().equals(request.getPasswordCheck())) {
             throw new CustomException(ErrorCode.PASSWORD_MISMATCH);
@@ -55,6 +55,22 @@ public class UserService {
         User savedUser = userRepository.save(user);
         //엔티티 -> 응답DTO(필요한 값만 컨트롤러에 전달)
         return new UserResponseDto(savedUser);
+    }
+    //1.1 이메일 중복 체크
+    @Transactional
+    public boolean checkMail(String email){
+        boolean isDuplicated = userRepository.existsByEmailAndStatus(email,EntityStatus.ACTIVE);
+        System.out.println("isDuplicated = " + isDuplicated);
+        if(isDuplicated){throw new CustomException(ErrorCode.EXIST_EMAIL);}
+        return true;
+    }
+    //1.2 닉네임 중복 체크
+    @Transactional
+    public boolean checkNick(String nickName){
+        boolean isDuplicatedNick = userRepository.existsByNickNameAndStatus(nickName,EntityStatus.ACTIVE);
+        System.out.println("isNickDuplicated = " + isDuplicatedNick);
+        if(isDuplicatedNick){throw new CustomException(ErrorCode.EXIST_EMAIL);}
+        return true;
     }
     //2. 유저 조회
     @Transactional(readOnly = true)
@@ -87,11 +103,12 @@ public class UserService {
         }
         User user = userRepository.findByUserIdAndStatus(userId, EntityStatus.ACTIVE)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        //현재 비밀번호 입력(검증) -> 일단 삭제, 프론트에는 입력공간이 없었음
+        //현재 비밀번호 입력(검증) -> 프론트에는 입력공간이 없었음(보류상태)
 //        //matches(방금 입력한 평문 비번, DB저장된 암호화 비번)
 //        if(!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())){
 //            throw new CustomException(ErrorCode.INVALID_PASSWORD);
-//        }//새 비번 입력, 확인 검징
+//        }
+        // 새 비번 입력, 확인 검징
         if(!request.getNewPassword().equals(request.getNewPasswordCheck())){
             throw new CustomException(ErrorCode.PASSWORD_MISMATCH);
         }
@@ -100,6 +117,9 @@ public class UserService {
 
         //암호환 한 비번으로 변경
         user.changeUserPassword(encodedNewPassword);
+
+        //기존 리프레시 토큰 삭제
+        refreshTokenRepository.deleteByUserId(userId);
         return new UserResponseDto(user);
     }
 
@@ -127,10 +147,6 @@ public class UserService {
                 .orElseThrow(() -> new CustomException(ErrorCode.INVALID_LOGIN));
 
         // 2. 비밀번호 검증
-        // 평문 비교(암호화 정상 작동 확인 후 삭제)
-//        if (!user.getPassword().equals(loginRequest.getPassword())) {
-//            throw new IllegalArgumentException("이메일 또는 비밀번호가 올바르지 않습니다.");
-//        }
         //평문 -> 암호화로 변경
         if(!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())){
             throw new CustomException(ErrorCode.INVALID_LOGIN);
@@ -157,7 +173,7 @@ public class UserService {
                 new RefreshToken(
                         refreshToken,
                         user.getUserId(),
-                        LocalDateTime.now().plusDays(14)
+                        LocalDateTime.now().plusSeconds(900)
                 )
         );
 
@@ -216,7 +232,7 @@ public class UserService {
                     new RefreshToken(
                             newRefreshToken,
                             user.getUserId(),
-                            LocalDateTime.now().plusDays(14)
+                            LocalDateTime.now().plusSeconds(900)
                     )
             );
 

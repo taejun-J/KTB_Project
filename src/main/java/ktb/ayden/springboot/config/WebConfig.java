@@ -13,7 +13,9 @@ public class WebConfig  implements WebMvcConfigurer {
                 //Cors 에러 대비 -> 사용하는 url입력
                 .allowedOrigins(
                         "http://localhost:8082",
-                        "http://127.0.0.1:8082"
+                        "http://127.0.0.1:8082",
+                        "https://www.ayden1.cloud"
+
                 )
                 .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
                 .allowedHeaders("*")

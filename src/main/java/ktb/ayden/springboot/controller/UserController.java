@@ -5,6 +5,7 @@ import ktb.ayden.springboot.common.response.ApiResponse;
 import ktb.ayden.springboot.dto.*;
 import ktb.ayden.springboot.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,10 +24,23 @@ public class UserController {
     //회원가입
     @PostMapping
     //반환 타입 UserResponseDto -> ApiResponse
-
     public ApiResponse<UserResponseDto>createUser(@Valid @RequestBody UserRequestDto request){
         UserResponseDto res = userService.createUser(request);
         return ApiResponse.success(res,"회원가입 성공");
+    }
+    //회원가입시 이메일 중복 체크
+    @GetMapping("/email/check")
+    public ApiResponse<Boolean>emailCheck(@RequestParam String email){
+
+        Boolean res = userService.checkMail(email);
+        return ApiResponse.success(res,"이메일 사용가능");
+    }
+    //회원가입시 닉네임 중복 체크
+    @GetMapping("/nickname/check")
+    public ApiResponse<Boolean>nickNameCheck(@RequestParam String nickName){
+
+        Boolean res = userService.checkNick(nickName);
+        return ApiResponse.success(res,"닉네임 사용가능");
     }
     //회원조회
     @GetMapping("/{userId}")
@@ -43,8 +57,23 @@ public class UserController {
     }
     //회원 정보 수정 (비밀번호)
     @PutMapping("/{userId}/password")
-    public ApiResponse<UserResponseDto> updateUserPassword(@RequestAttribute("userId") Long loginUserId, @PathVariable Long userId,@Valid @RequestBody UserPasswordUpdateReqDto request){
-        UserResponseDto res = userService.updateUserPassword(loginUserId,userId,request);
+    public ApiResponse<UserResponseDto> updateUserPassword(@RequestAttribute("userId") Long loginUserId, @PathVariable Long userId,@Valid @RequestBody UserPasswordUpdateReqDto request, HttpServletResponse response){
+
+            UserResponseDto res = userService.updateUserPassword(loginUserId, userId, request);
+            ResponseCookie deleteCookie = ResponseCookie
+                    .from("refreshToken", "")
+                    .httpOnly(true)
+                    .secure(false)
+                    .path("/")
+                    .maxAge(0)
+                    .sameSite("Lax")
+                    .build();
+
+            response.addHeader(
+                    HttpHeaders.SET_COOKIE,
+                    deleteCookie.toString()
+            );
+
         return ApiResponse.success(res,"비밀번호 변경 성공");
     }
     //회원탈퇴
@@ -73,7 +102,7 @@ public class UserController {
                 .httpOnly(true)      // JS 접근 불가
                 .secure(false)       // HTTPS 환경이면 true 권장
                 .path("/")
-                .maxAge(14 * 24 * 60 * 60) // 14일
+                .maxAge(900) // 15분
                 .sameSite("Strict")
                 .build();
 
@@ -119,7 +148,7 @@ public class UserController {
                     .httpOnly(true)
                     .secure(false)
                     .path("/")
-                    .maxAge(14 * 24 * 60 * 60)
+                    .maxAge(900)//15분
                     .sameSite("Lax")
                     .build();
 

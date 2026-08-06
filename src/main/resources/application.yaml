@@ -25,3 +25,25 @@ jwt:
   secret: ${JWT_SECRET}
   access-token-exp-seconds: ${JWT_ACCESS_TOKEN_EXP_SECONDS:900}
   refresh-token-exp-seconds: ${JWT_REFRESH_TOKEN_EXP_SECONDS:12096000}
+
+#k8s에서 검사할 liveness, readiness probe용 + ALB용
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      livenessstate:
+        enabled: true
+      readinessstate:
+        enabled: true
+      group:
+        readiness:
+          include:
+            - readinessState
+            - db
+#includ db -> db연결이 가능한지 확인용
