@@ -46,6 +46,7 @@ public class Post {
         this.status = EntityStatus.ACTIVE;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
+
     }
     //Post 엔티티의 상태변경 메서드는 엔티티에서
     public void changePostInformation(String postName, String postContent, String postImage) {
@@ -57,5 +58,8 @@ public class Post {
     public void changePostStatus(EntityStatus status){
         this.status = status;
     }
-
+    //이미지 추가
+    public void registerPostImage(String postImage) {
+        this.postImage = postImage;
+    }
 }

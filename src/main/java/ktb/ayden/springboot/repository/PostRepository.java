@@ -42,7 +42,8 @@ long increaseViewCount(
         p.postViewCount,
         p.status,
         p.createdAt,
-        p.updatedAt
+        p.updatedAt,
+        u.profileImage
     )
     from Post p
     join p.postedUser u

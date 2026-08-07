@@ -23,7 +23,32 @@ public enum ErrorCode {
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "댓글을 찾을 수 없습니다."),
 
     POST_LIKE_NOT_FOUND(HttpStatus.NOT_FOUND,"좋아요를 누른 적 없는 게시글입니다"),
-    ALREADY_LIKED_POST(HttpStatus.CONFLICT, "이미 좋아요를 누른 게시글입니다");
+    ALREADY_LIKED_POST(HttpStatus.CONFLICT, "이미 좋아요를 누른 게시글입니다"),
+
+    //s3용
+    EMPTY_IMAGE(
+            HttpStatus.BAD_REQUEST,
+            "이미지 파일이 비어 있습니다."
+    ),
+
+    IMAGE_SIZE_EXCEEDED(
+            HttpStatus.BAD_REQUEST,
+            "이미지 크기는 5MB를 초과할 수 없습니다."
+    ),
+
+    INVALID_IMAGE_TYPE(
+            HttpStatus.BAD_REQUEST,
+            "JPEG, PNG, WEBP 이미지만 업로드할 수 있습니다."
+    ),
+
+    IMAGE_UPLOAD_FAILED(
+            HttpStatus.INTERNAL_SERVER_ERROR,
+            "이미지 업로드에 실패했습니다."
+    ),
+    PROFILE_IMAGE_ALREADY_EXISTS(
+            HttpStatus.CONFLICT,
+            "프로필 이미지가 이미 등록되어 있습니다."
+    );
 
     private final HttpStatus status;
     private final String message;

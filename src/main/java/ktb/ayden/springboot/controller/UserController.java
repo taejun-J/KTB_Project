@@ -6,14 +6,12 @@ import ktb.ayden.springboot.dto.*;
 import ktb.ayden.springboot.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.repository.query.Param;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
 //인증인가이후
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
+import org.springframework.web.multipart.MultipartFile;
 
 //HTTP요청을 받는 컨트롤러를 의미 <- RestController
 @RestController
@@ -82,8 +80,30 @@ public class UserController {
         UserResponseDto res =userService.softDeleteUser(loginUserId, userId);
         return ApiResponse.success(res,"회원탈퇴 성공");
     }
+    //s3
+    @PostMapping(
+            value = "/profile-image",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    @ResponseStatus(HttpStatus.CREATED)
+    public ApiResponse<ProfileImageResponseDto> uploadProfileImage(
+            @RequestAttribute("userId") Long userId,
+            @RequestPart("image") MultipartFile image
+    ) {
+        String imageUrl = userService.uploadProfileImage(
+                userId,
+                image
+        );
 
-    //하단은 로그인 관련(인증,인가 추가 이후)
+        ProfileImageResponseDto response =
+                new ProfileImageResponseDto(imageUrl);
+
+        return ApiResponse.success(
+                response,
+                "프로필 이미지 업로드 완료"
+        );
+    }
+
 
     // 로그인
     @PostMapping("/auth")

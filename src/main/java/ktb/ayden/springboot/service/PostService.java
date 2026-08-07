@@ -15,6 +15,7 @@ import ktb.ayden.springboot.repository.PostRepository;
 import ktb.ayden.springboot.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final UserPostLikeRepository userPostLikeRepository;
+    private final S3ImageService s3ImageService;
 
 
     //1.게시글 추가
@@ -114,6 +116,13 @@ public class PostService {
 //        return new PostDetailResponseDto(post,postLikeCount);
         return new PostDetailResponseDto(post,postLikeCount,isLiked);
 
+    }
+    //6. 이미지 업로드
+    public String uploadPostImage(MultipartFile postFile) {
+        return s3ImageService.upload(
+                postFile,
+                "post-images"
+        );
     }
 
 }

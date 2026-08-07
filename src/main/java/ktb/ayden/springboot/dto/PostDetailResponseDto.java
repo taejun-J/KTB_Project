@@ -26,6 +26,7 @@ public class PostDetailResponseDto {
     private EntityStatus status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private String profileImage;
 
 //    public PostDetailResponseDto(Post post, long postLikesCount){
     //좋아요 여부를 응답에 실어야 프론트가 새로고침 후에도 토글 방향을 알 수 있음
@@ -44,6 +45,7 @@ public class PostDetailResponseDto {
         this.status = post.getStatus();
         this.createdAt = post.getCreatedAt();
         this.updatedAt = post.getUpdatedAt();
+        this.profileImage = post.getPostedUser().getProfileImage();
 
     }
 }

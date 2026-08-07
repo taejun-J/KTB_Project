@@ -9,7 +9,9 @@ import ktb.ayden.springboot.entity.Post;
 import ktb.ayden.springboot.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -63,7 +65,23 @@ public class PostController {
         PostDetailResponseDto res = postService.softDeletePost(userId,postId);
         return ApiResponse.success(res,"게시글 삭제 성공");
     }
+    //6. 첨부파일 업로드
+    @PostMapping(
+            value = "/upload/attach",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public ApiResponse<String> uploadAttach(
+            @RequestPart("postFile") MultipartFile postFile
+    ) {
+        String fileUrl =
+                postService.uploadPostImage(postFile);
 
-
-
+        return ApiResponse.success(
+                fileUrl,
+                "첨부파일 업로드 성공"
+        );
+    }
 }
+
+
+

@@ -19,6 +19,8 @@ public class CommentResponseDto {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    private String profileImage;
+
     public CommentResponseDto(Comment comment){
         this.commentId = comment.getCommentId();
         this.commentText = comment.getCommentText();
@@ -30,5 +32,7 @@ public class CommentResponseDto {
         this.status = comment.getStatus();
         this.createdAt = comment.getCreatedAt();
         this.updatedAt = comment.getUpdatedAt();
+
+        this.profileImage = comment.getCommentedUser().getProfileImage();
     }
 }

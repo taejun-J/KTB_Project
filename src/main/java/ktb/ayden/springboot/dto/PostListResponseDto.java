@@ -19,6 +19,8 @@ public class PostListResponseDto {
     private EntityStatus status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private String profileImage;
+
 
 //    public PostListResponseDto(Post post){
 //        this.postId = post.getPostId();
@@ -45,8 +47,11 @@ public class PostListResponseDto {
             Long postViewCount,
             EntityStatus status,
             LocalDateTime createdAt,
-            LocalDateTime updatedAt
+            LocalDateTime updatedAt,
+            String profileImage
+
     ){
+
         this.postId = postId;
         this.postName = postName;
         this.postUser = postUser;
@@ -56,6 +61,6 @@ public class PostListResponseDto {
         this.status = status;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
-
+        this.profileImage = profileImage;
     }
 }

@@ -24,7 +24,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             "/users/token/refresh",
             "/actuator/health",
             "/users/email/check",
-            "/users/nickname/check"
+            "/users/nickname/check",
+            "/users/profile-image"
     };
 
     @Override
@@ -66,6 +67,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return true;
         }
         if (uri.equals("/users/nickname/check") && "GET".equalsIgnoreCase(method)) {
+            return true;
+        }
+        if (uri.equals("/users/profile-image") && "GET".equalsIgnoreCase(method)) {
             return true;
         }
 

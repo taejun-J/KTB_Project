@@ -17,6 +17,8 @@ import ktb.ayden.springboot.repository.RefreshTokenRepository;
 
 //암호화
 import org.springframework.security.crypto.password.PasswordEncoder;
+//s3
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 
@@ -30,6 +32,8 @@ public class UserService {
     private final JwtProvider jwtProvider;
     //검증 + 암호화
     private final PasswordEncoder passwordEncoder;
+    //s3
+    private final S3ImageService s3ImageService;
 
     //1. 회원가입
     //이 메서드 안의 DB작업을 하나의 묶음으로 처리하라는 것 == 원자성
@@ -134,6 +138,39 @@ public class UserService {
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         user.changeUserStatus(EntityStatus.INACTIVE);
         return new UserResponseDto(user);
+    }
+    //6.s3 이미지 업로드
+    @Transactional
+    public String uploadProfileImage(
+            Long userId,
+            MultipartFile image
+    ) {
+        User user = userRepository
+                .findByUserIdAndStatus(
+                        userId,
+                        EntityStatus.ACTIVE
+                )
+                .orElseThrow(() ->
+                        new CustomException(
+                                ErrorCode.USER_NOT_FOUND
+                        )
+                );
+
+        if (user.getProfileImage() != null
+                && !user.getProfileImage().isBlank()) {
+            throw new CustomException(
+                    ErrorCode.PROFILE_IMAGE_ALREADY_EXISTS
+            );
+        }
+
+        String imageUrl = s3ImageService.upload(
+                image,
+                "profile-images/" + userId
+        );
+
+        user.registerProfileImage(imageUrl);
+
+        return imageUrl;
     }
 
     //인증,인가 이후 로그인 관련
