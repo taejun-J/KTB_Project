@@ -1,17 +1,18 @@
 package ktb.ayden.springboot.controller;
 
 import ktb.ayden.springboot.common.response.ApiResponse;
-import ktb.ayden.springboot.dto.PostDetailResponseDto;
-import ktb.ayden.springboot.dto.PostListResponseDto;
-import ktb.ayden.springboot.dto.PostRequestDto;
-import ktb.ayden.springboot.dto.UserResponseDto;
+import ktb.ayden.springboot.document.PostDocument;
+import ktb.ayden.springboot.dto.*;
 import ktb.ayden.springboot.entity.Post;
+//import ktb.ayden.springboot.service.PostSearchBenchmarkService;
+import ktb.ayden.springboot.service.PostSearchIndexService;
 import ktb.ayden.springboot.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import ktb.ayden.springboot.service.PostSearchService;
 
 import java.util.List;
 
@@ -41,6 +42,80 @@ public class PostController {
         //DB에서 조회한 게시글 엔티티를 DTO로 변환하면 List<PostListResponseDto>
         return ApiResponse.success(res,"게시글 목록 조회");
     }
+    //2.1 게시글 검색 (like)
+    @GetMapping("/search")
+    public ApiResponse<List<PostListResponseDto>> searchPosts(
+            @RequestParam String keyword
+    ) {
+
+        List<PostListResponseDto> result =
+                postService.searchPosts(keyword);
+
+        return ApiResponse.success(
+                result,
+                "게시글 검색 완료"
+        );
+    }
+//    // 2.2 검색 성능 비교 - LIKE
+//    private final PostSearchBenchmarkService postSearchBenchmarkService;
+//    @GetMapping("/search/benchmark/like")
+//    public ApiResponse<List<PostSearchBenchmarkDto>> benchmarkLike(
+//            @RequestParam String keyword
+//    ) {
+//
+//        List<PostSearchBenchmarkDto> result =
+//                postSearchBenchmarkService.searchLike(keyword);
+//
+//        return ApiResponse.success(
+//                result,
+//                "LIKE 검색 완료"
+//        );
+//    }
+//
+//
+//    // 검색 성능 비교 - FULLTEXT
+//    @GetMapping("/search/benchmark/fulltext")
+//    public ApiResponse<List<PostSearchBenchmarkDto>> benchmarkFullText(
+//            @RequestParam String keyword
+//    ) {
+//
+//        List<PostSearchBenchmarkDto> result =
+//                postSearchBenchmarkService.searchFullText(keyword);
+//
+//        return ApiResponse.success(
+//                result,
+//                "FULLTEXT 검색 완료"
+//        );
+//    }
+//
+//
+//    // 검색 성능 비교 - Elasticsearch
+//    @GetMapping("/search/benchmark/elasticsearch")
+//    public ApiResponse<List<PostSearchBenchmarkDto>> benchmarkElasticsearch(
+//            @RequestParam String keyword
+//    ) {
+//
+//        List<PostSearchBenchmarkDto> result =
+//                postSearchBenchmarkService.searchElasticsearch(keyword);
+//
+//        return ApiResponse.success(
+//                result,
+//                "Elasticsearch 검색 완료"
+//        );
+//    }
+    //2.2 ES(테스트용으로 보관)
+//    private final PostSearchIndexService postSearchIndexService;
+//    @PostMapping("/search/index")
+//    public ApiResponse<Long> indexPostsToElasticsearch() {
+//
+//        long indexedCount =
+//                postSearchIndexService.indexAllPosts();
+//
+//        return ApiResponse.success(
+//                indexedCount,
+//                "Elasticsearch 초기 색인 완료"
+//        );
+//    }
     //3. 게시글 상세 조회
     @GetMapping("/{postId}")
 //    public ApiResponse<PostDetailResponseDto>getPostDetail(@PathVariable Long postId){

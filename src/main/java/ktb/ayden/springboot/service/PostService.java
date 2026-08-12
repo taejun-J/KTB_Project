@@ -19,6 +19,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -43,6 +47,8 @@ public class PostService {
                 user
         );
         Post savedPost = postRepository.save(post);
+        //es와 db동기화
+        postSearchService.syncPost(savedPost);
         Long postId = post.getPostId();
         Long postLikeCount =
                 userPostLikeRepository.countByPost_PostId(postId);
@@ -58,6 +64,67 @@ public class PostService {
 //
         //좋아요수/댓글수까지 DB에서 집계해서 한 번에 받아옴
         return postRepository.findPostListWithCounts(EntityStatus.ACTIVE);
+    }
+    //2.1 게시글 검색(like)
+//    @Transactional(readOnly = true)
+//    public List<PostListResponseDto> searchPosts(String keyword) {
+//
+//        //입력창이 비어있으면 그냥 전체 post출력
+//        if (keyword == null || keyword.isBlank()) {
+//            return getPostList();
+//        }
+//
+//        return postRepository.searchPostListByKeyword(
+//                keyword.trim(),
+//                EntityStatus.ACTIVE
+//        );
+//    }
+    private final PostSearchService postSearchService;
+    @Transactional(readOnly = true)
+    public List<PostListResponseDto> searchPosts(String keyword) {
+
+
+        String searchKeyword = keyword.trim();
+
+        // 검색어가 비어있으면 빈 리스트
+        if (searchKeyword.isEmpty()) {
+            return List.of();
+        }
+
+
+        // 1. Elasticsearch에서 검색
+        List<Long> postIds =
+                postSearchService.searchPostIds(searchKeyword);
+
+
+        // 검색 결과 없음
+        if (postIds.isEmpty()) {
+            return List.of();
+        }
+
+
+        // 2. Elasticsearch가 찾은 ID로 MySQL 실제 데이터 조회
+        List<PostListResponseDto> posts =
+                postRepository.findPostListByIds(
+                        postIds,
+                        EntityStatus.ACTIVE
+                );
+
+
+        // 3. MySQL 조회 결과를 postId 기준 Map으로 변환
+        Map<Long, PostListResponseDto> postMap =
+                posts.stream()
+                        .collect(Collectors.toMap(
+                                PostListResponseDto::getPostId,
+                                Function.identity()
+                        ));
+
+
+        // 4. Elasticsearch가 반환한 순서를 그대로 유지
+        return postIds.stream()
+                .map(postMap::get)
+                .filter(Objects::nonNull)
+                .toList();
     }
 
     //3. 게시글 상세 조회
@@ -94,6 +161,8 @@ public class PostService {
                     request.getPostContent(),
                     request.getPostImage()
             );
+        //es-db동기화
+        postSearchService.syncPost(post);
         Long postLikeCount =
                 userPostLikeRepository.countByPost_PostId(postId);
         boolean isLiked = userId != null && userPostLikeRepository.existsByUser_UserIdAndPost_PostId(userId,postId);
@@ -110,6 +179,8 @@ public class PostService {
             throw new CustomException(ErrorCode.FORBIDDEN_USER);
         }
         post.changePostStatus(EntityStatus.INACTIVE);
+        //es-db동기화
+        postSearchService.syncPost(post);
         Long postLikeCount =
                 userPostLikeRepository.countByPost_PostId(postId);
         boolean isLiked = userId != null && userPostLikeRepository.existsByUser_UserIdAndPost_PostId(userId,postId);
