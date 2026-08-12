@@ -6,7 +6,7 @@ on:
   #test때는 feature브랜치에 테스
   push:
     branches:
-      - feature/ci-cd-test
+      - main
 
 permissions:
   contents: read
