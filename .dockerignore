@@ -1,0 +1,23 @@
+# Gradle 로컬 캐시
+.gradle
+
+# 로컬 빌드 결과물
+build
+
+.idea
+*.iml
+
+.DS_Store
+
+# Git 관련 파일
+.git
+.gitignore
+.gitattributes
+
+
+README.md
+HELP.md
+
+.env
+
+*.log
