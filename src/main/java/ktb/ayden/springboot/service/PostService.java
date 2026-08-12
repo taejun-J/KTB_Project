@@ -3,6 +3,7 @@ package ktb.ayden.springboot.service;
 //import jakarta.transaction.Transactional;
 import ktb.ayden.springboot.common.exception.CustomException;
 import ktb.ayden.springboot.common.exception.ErrorCode;
+import ktb.ayden.springboot.repository.UserPostLikeRepository;
 import org.springframework.transaction.annotation.Transactional;
 import ktb.ayden.springboot.common.EntityStatus;
 import ktb.ayden.springboot.dto.PostDetailResponseDto;
@@ -14,6 +15,7 @@ import ktb.ayden.springboot.repository.PostRepository;
 import ktb.ayden.springboot.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,8 +23,12 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class PostService {
+
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final UserPostLikeRepository userPostLikeRepository;
+    private final S3ImageService s3ImageService;
+
 
     //1.게시글 추가
     //인증,인가 구현 후 추가
@@ -37,29 +43,42 @@ public class PostService {
                 user
         );
         Post savedPost = postRepository.save(post);
-        return new PostDetailResponseDto(savedPost);
+        Long postId = post.getPostId();
+        Long postLikeCount =
+                userPostLikeRepository.countByPost_PostId(postId);
+        boolean isLiked = userId != null && userPostLikeRepository.existsByUser_UserIdAndPost_PostId(userId,postId);
+//        return new PostDetailResponseDto(savedPost,postLikeCount);
+        return new PostDetailResponseDto(savedPost,postLikeCount,isLiked);
     }
 
     //2. 게시글 목록 조회
     @Transactional(readOnly = true)
     //리스트 조회니까 여기도 반환타입 맞춰야 함
     public List<PostListResponseDto> getPostList(){
-        List<Post> postList = postRepository.findAllByStatus(EntityStatus.ACTIVE);
-        //게시글 목록 DTO들을 담을 빈 result 리스트 생성
-        List<PostListResponseDto> result = new ArrayList<>();
-
-        for(Post post : postList){
-            result.add(new PostListResponseDto(post));
-        }
-        return result;
+//
+        //좋아요수/댓글수까지 DB에서 집계해서 한 번에 받아옴
+        return postRepository.findPostListWithCounts(EntityStatus.ACTIVE);
     }
 
     //3. 게시글 상세 조회
-    @Transactional(readOnly = true)
-    public PostDetailResponseDto getPostDetail(Long postId){
+    //조회수 계산로직 추가로 readonly 삭제
+    @Transactional
+    //좋아요 여부 판단에 userId가 필요 -> 비로그인 조회도 허용하므로 null 허용
+    public PostDetailResponseDto getPostDetail(Long userId, Long postId){
+        //조회수
+        Long res = postRepository.increaseViewCount(postId, EntityStatus.ACTIVE);
+            if(res == 0) {
+                throw new CustomException(ErrorCode.POST_NOT_FOUND);
+            }
         Post post = postRepository.findByPostIdAndStatus(postId, EntityStatus.ACTIVE)
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
-        return new PostDetailResponseDto(post);
+        //좋아요
+        Long postLikeCount = userPostLikeRepository.countByPost_PostId(postId);
+        //좋아요 여부
+        boolean isLiked = userId != null && userPostLikeRepository.existsByUser_UserIdAndPost_PostId(userId, postId);
+//
+        return new PostDetailResponseDto(post,postLikeCount,isLiked);
+
     }
 
     //4. 게시글 수정
@@ -75,7 +94,11 @@ public class PostService {
                     request.getPostContent(),
                     request.getPostImage()
             );
-            return new PostDetailResponseDto(post);
+        Long postLikeCount =
+                userPostLikeRepository.countByPost_PostId(postId);
+        boolean isLiked = userId != null && userPostLikeRepository.existsByUser_UserIdAndPost_PostId(userId,postId);
+//        return new PostDetailResponseDto(post,postLikeCount);
+        return new PostDetailResponseDto(post,postLikeCount,isLiked);
         }
 
     //5. 게시글 삭제(소프트딜리트)
@@ -87,8 +110,19 @@ public class PostService {
             throw new CustomException(ErrorCode.FORBIDDEN_USER);
         }
         post.changePostStatus(EntityStatus.INACTIVE);
-        return new PostDetailResponseDto(post);
+        Long postLikeCount =
+                userPostLikeRepository.countByPost_PostId(postId);
+        boolean isLiked = userId != null && userPostLikeRepository.existsByUser_UserIdAndPost_PostId(userId,postId);
+//        return new PostDetailResponseDto(post,postLikeCount);
+        return new PostDetailResponseDto(post,postLikeCount,isLiked);
 
+    }
+    //6. 이미지 업로드
+    public String uploadPostImage(MultipartFile postFile) {
+        return s3ImageService.upload(
+                postFile,
+                "post-images"
+        );
     }
 
 }

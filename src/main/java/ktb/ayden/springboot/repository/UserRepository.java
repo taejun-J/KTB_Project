@@ -14,6 +14,7 @@ public interface UserRepository extends JpaRepository<User, Long>{
     //소프트 딜리트 대응
     Optional<User> findByEmailAndStatus(String email, EntityStatus status);
     Optional<User> findByUserIdAndStatus(Long userId, EntityStatus status);
-    //중복 이메일 대응
-    boolean existsByEmail(String email);
+    //중복 이메일, 닉네임 대응
+    boolean existsByEmailAndStatus(String email, EntityStatus status);
+    boolean existsByNickNameAndStatus(String nickName, EntityStatus status);
 }

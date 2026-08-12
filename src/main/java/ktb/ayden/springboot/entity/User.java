@@ -5,6 +5,8 @@ package ktb.ayden.springboot.entity;
 import jakarta.persistence.*;
 //lombok은 반복적인 코드를 자동으로 만들어주는 라이브러리
 import ktb.ayden.springboot.common.EntityStatus;
+import ktb.ayden.springboot.common.exception.CustomException;
+import ktb.ayden.springboot.common.exception.ErrorCode;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -62,5 +64,15 @@ public class User{
     //회원 상태 변경(delete)
     public void changeUserStatus(EntityStatus status){
         this.status = status;
+    }
+    //s3 이미지 업로드
+    public void registerProfileImage(String profileImageUrl) {
+        if (this.profileImage != null && !this.profileImage.isBlank()) {
+            throw new CustomException(
+                    ErrorCode.PROFILE_IMAGE_ALREADY_EXISTS
+            );
+        }
+
+        this.profileImage = profileImageUrl;
     }
 }
