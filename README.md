@@ -150,6 +150,36 @@ src/main/resources/
 > 비밀번호, JWT Secret, AWS Access Key와 같은 민감 정보 => GitHub Secrets , BE EC2 .env로 관리합니다.
 
 ---
+## GitHub Actions Runner IP 기반 동적 Security Group 제어
+
+GitHub-hosted Runner는 실행할 때마다 Public IP가 변경될 수 있기 때문에,
+Bastion 서버의 SSH 포트(22)를 특정 고정 IP로 제한하기 어려운 문제가 있었습니다.
+
+이를 해결하기 위해 배포 Workflow 실행 시 다음 과정을 자동화했습니다.
+
+```text
+GitHub Actions Runner
+        │
+        │ OIDC 인증
+        ▼
+     AWS IAM Role
+        │
+        ▼
+Runner Public IP 확인
+        │
+        ▼
+Bastion Security Group
+TCP 22 / Runner IP(/32) 임시 허용
+        │
+        ▼
+Runner → Bastion → Backend EC2
+            SSH / ProxyJump
+        │
+        ▼
+       Deploy
+        │
+        ▼
+Security Group Rule 제거
 
 #  프로젝트 구조
 
@@ -374,10 +404,6 @@ MySQL LIKE
 **검색 조건과 데이터 특성에 적합한 Index 및 검색 시스템을 선택해야 한다는 점**을 확인했습니다.
 
 ---
-
-#  데이터베이스 설계
-![스크린샷 2026-05-31 오후 11.52.16.png](../../Downloads/%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7%202026-05-31%20%EC%98%A4%ED%9B%84%2011.52.16.png)
-
 
 #  Health Check
 
